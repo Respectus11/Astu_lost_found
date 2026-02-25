@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, X } from 'lucide-react'
+import { useEffect } from 'react'
 
 const categories = [
   { value: '', label: 'All' },
@@ -126,6 +127,8 @@ const SearchBar = ({ onSearch, initialSearch = '', initialCategory = '', initial
               ))}
             </select>
           </div>
+  
+
 
           {/* Status Filter */}
           <div style={{ flex: '1', minWidth: '150px' }}>
