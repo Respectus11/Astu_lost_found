@@ -639,7 +639,7 @@ const Home = () => {
           fontSize: '0.8rem',
           color: 'var(--text-muted)',
         }}>
-          © 2024 ASTU Lost & Found. Built with care for the campus community.
+          © 2026 ASTU Lost & Found. Built for the campus community developed by Kalab Bilhatu.
         </p>
       </footer>
 

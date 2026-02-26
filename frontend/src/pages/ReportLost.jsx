@@ -14,9 +14,8 @@ const categories = [
 ]
 
 const locations = [
-  'Library', 'Cafeteria', 'Main Building', 'Science Block',
-  'Sports Complex', 'Hostel', 'Parking Area', 'Other',
-]
+  'Stadium (futsal)', 'Cafe', 'borchamu Building', 'central library',
+    'applied library', 'females library', 'Geda gate', 'Other',]
 
 const ReportLost = () => {
   const [formData, setFormData] = useState({

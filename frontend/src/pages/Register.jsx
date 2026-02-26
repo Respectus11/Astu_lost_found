@@ -147,7 +147,7 @@ const Register = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
+                placeholder="yosef debebe"
                 required
                 style={{
                   width: '100%',
