@@ -1,5 +1,5 @@
-import User from "../models/User.js";
-import jwt from "jsonwebtoken";
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 // Generate JWT
 const generateToken = (id, role) => {
@@ -9,8 +9,21 @@ const generateToken = (id, role) => {
 };
 
 // Register user
-export const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
+
+  // Input validation
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters long" });
+  }
+
+  if (!email.includes('@')) {
+    return res.status(400).json({ message: "Please provide a valid email address" });
+  }
 
   try {
     const userExists = await User.findOne({ email });
@@ -33,8 +46,13 @@ export const registerUser = async (req, res) => {
 };
 
 // Login user
-export const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ message: "Please provide email and password" });
+  }
 
   try {
     const user = await User.findOne({ email });
@@ -53,4 +71,9 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
+};
+
+module.exports = {
+  registerUser,
+  loginUser
 };

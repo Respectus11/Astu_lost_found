@@ -1,5 +1,5 @@
 const express = require("express");
-const { approveClaim, rejectClaim } = require("../controllers/adminController");
+const { approveClaim, rejectClaim } = require("../controllers/adminControllers");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
 const router = express.Router();
