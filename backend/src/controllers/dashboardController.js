@@ -17,18 +17,13 @@ const getDashboardStats = async (req, res) => {
     const rejectedClaims = await Claim.countDocuments({ status: "rejected" });
 
     res.json({
-      items: {
-        total: totalItems,
-        lost: lostItems,
-        found: foundItems,
-        claimed: claimedItems,
-      },
-      claims: {
-        total: totalClaims,
-        pending: pendingClaims,
-        approved: approvedClaims,
-        rejected: rejectedClaims,
-      },
+      totalItems: totalItems,
+      lostItems: lostItems,
+      foundItems: foundItems,
+      claimedItems: claimedItems,
+      pendingClaims: pendingClaims,
+      approvedClaims: approvedClaims,
+      rejectedClaims: rejectedClaims,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching dashboard stats", error: error.message });

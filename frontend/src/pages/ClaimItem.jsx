@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, AlertCircle, CheckCircle, MapPin, Calendar, Image } from 'lucide-react'
+import { ArrowLeft, AlertCircle, CheckCircle, XCircle, MapPin, Calendar, Image, Clock } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useItems } from '../context/ItemContext.jsx'
 
 const ClaimItem = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
-  const { getItemById, claimItem } = useItems()
+  const { isAuthenticated, user } = useAuth()
+  const { getItemById, claimItem, getUserClaims } = useItems()
   
   const [item, setItem] = useState(null)
   const [proof, setProof] = useState('')
@@ -17,15 +17,30 @@ const ClaimItem = () => {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [userClaims, setUserClaims] = useState([])
+  const [claimsLoading, setClaimsLoading] = useState(true)
+  const [userClaimForItem, setUserClaimForItem] = useState(null)
 
   useEffect(() => {
-    const fetchItem = async () => {
-      const data = await getItemById(id)
-      setItem(data)
+    const fetchData = async () => {
+      const itemData = await getItemById(id)
+      setItem(itemData)
       setLoading(false)
+      
+      if (isAuthenticated) {
+        const claimsData = await getUserClaims()
+        setUserClaims(claimsData)
+        setClaimsLoading(false)
+        
+        // Find if user has a claim for this specific item
+        const claimForItem = claimsData.find(claim => claim.item?._id === id)
+        setUserClaimForItem(claimForItem)
+      } else {
+        setClaimsLoading(false)
+      }
     }
-    fetchItem()
-  }, [id])
+    fetchData()
+  }, [id, isAuthenticated])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -108,6 +123,53 @@ const ClaimItem = () => {
             <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: '2rem' }}>
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Claim This Item</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.7 }}>Provide proof of ownership to help us verify your claim.</p>
+              
+              {/* User Claim Status */}
+              {userClaimForItem && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    {userClaimForItem.status === 'pending' && <Clock size={20} color="var(--accent-teal)" />}
+                    {userClaimForItem.status === 'approved' && <CheckCircle size={20} color="var(--status-found)" />}
+                    {userClaimForItem.status === 'rejected' && <XCircle size={20} color="var(--status-lost)" />}
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Your Claim: {userClaimForItem.status === 'pending' ? 'Under Review' : userClaimForItem.status === 'approved' ? 'Approved' : 'Rejected'}
+                    </span>
+                  </div>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
+                    Submitted on {formatDate(userClaimForItem.dateSubmitted)}
+                  </p>
+                  
+                  {userClaimForItem.status === 'approved' && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'rgba(46, 213, 115, 0.1)', border: '1px solid rgba(46, 213, 115, 0.3)', borderRadius: 'var(--radius-sm)', padding: '0.75rem' }}>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                        <strong>Ready for Collection!</strong> Your claim has been approved.
+                      </p>
+                      {userClaimForItem.collectionInstructions && (
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'rgba(245, 166, 35, 0.1)', border: '1px solid rgba(245, 166, 35, 0.2)', borderRadius: 'var(--radius-sm)', padding: '0.5rem' }}>
+                          <strong>Collection Instructions:</strong> {userClaimForItem.collectionInstructions}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                  
+                  {userClaimForItem.status === 'rejected' && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'rgba(255, 71, 87, 0.1)', border: '1px solid rgba(255, 71, 87, 0.3)', borderRadius: 'var(--radius-sm)', padding: '0.75rem' }}>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        Unfortunately, your claim was not approved. If you believe this is an error, please contact the admin office for clarification.
+                      </p>
+                    </motion.div>
+                  )}
+                  
+                  {userClaimForItem.status === 'pending' && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'rgba(0, 212, 170, 0.1)', border: '1px solid rgba(0, 212, 170, 0.3)', borderRadius: 'var(--radius-sm)', padding: '0.75rem' }}>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        Your claim is currently being reviewed by our admin team. You will be notified once a decision has been made.
+                      </p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+              
               {error && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1rem', background: 'rgba(255, 71, 87, 0.1)', border: '1px solid rgba(255, 71, 87, 0.2)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', color: 'var(--status-lost)', fontSize: '0.9rem' }}><AlertCircle size={18} />{error}</motion.div>}
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '1.5rem' }}>

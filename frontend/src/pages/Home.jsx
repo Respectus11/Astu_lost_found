@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, Plus, AlertCircle, CheckCircle, ArrowRight, Sparkles, Users, Shield } from 'lucide-react'
 import ItemCard from '../components/ItemCard.jsx'
 import { useItems } from '../context/ItemContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const Home = () => {
   const { items, fetchItems, loading } = useItems()
+  const { isAdmin, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+
+  // Redirect admins to admin dashboard
+  useEffect(() => {
+    if (isAuthenticated && isAdmin()) {
+      navigate('/admin')
+    }
+  }, [isAuthenticated, isAdmin, navigate])
 
   useEffect(() => {
     fetchItems({ status: 'found', limit: 6 })

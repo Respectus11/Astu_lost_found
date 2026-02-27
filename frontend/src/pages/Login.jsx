@@ -18,14 +18,19 @@ const Login = () => {
     setError('')
     setLoading(true)
 
-    const result = await login(email, password)
-    
-    if (result.success) {
-      navigate('/')
-    } else {
-      setError(result.message || 'Invalid credentials')
+    try {
+      const result = await login(email, password)
+      
+      if (result.success) {
+        navigate('/')
+      } else {
+        setError(result.message || 'Invalid credentials')
+      }
+    } catch (error) {
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

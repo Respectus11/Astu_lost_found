@@ -9,6 +9,7 @@ import ReportLost from './pages/ReportLost'
 import ReportFound from './pages/ReportFound'
 import ClaimItem from './pages/ClaimItem'
 import AdminDashboard from './pages/AdminDashboard'
+import MyClaims from './pages/MyClaims'
 
 const pageVariants = {
   initial: {
@@ -37,11 +38,11 @@ function App() {
     <div className="app">
       <Navbar />
       
-      <AnimatePresence mode="wait">
-        <Routes>
-          <Route 
-            path="/" 
-            element={
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="home"
                 variants={pageVariants}
@@ -51,11 +52,13 @@ function App() {
               >
                 <Home />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/login" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="login"
                 variants={pageVariants}
@@ -65,11 +68,13 @@ function App() {
               >
                 <Login />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/register" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="register"
                 variants={pageVariants}
@@ -79,11 +84,13 @@ function App() {
               >
                 <Register />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/search" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/search" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="search"
                 variants={pageVariants}
@@ -93,11 +100,13 @@ function App() {
               >
                 <SearchItems />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/report-lost" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/report-lost" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="report-lost"
                 variants={pageVariants}
@@ -107,11 +116,13 @@ function App() {
               >
                 <ReportLost />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/report-found" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/report-found" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="report-found"
                 variants={pageVariants}
@@ -121,11 +132,13 @@ function App() {
               >
                 <ReportFound />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/claim/:id" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/claim/:id" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="claim"
                 variants={pageVariants}
@@ -135,11 +148,29 @@ function App() {
               >
                 <ClaimItem />
               </motion.div>
-            } 
-          />
-          <Route 
-            path="/admin" 
-            element={
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/my-claims" 
+          element={
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="my-claims"
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+              >
+                <MyClaims />
+              </motion.div>
+            </AnimatePresence>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <AnimatePresence mode="wait">
               <motion.div
                 key="admin"
                 variants={pageVariants}
@@ -149,10 +180,10 @@ function App() {
               >
                 <AdminDashboard />
               </motion.div>
-            } 
-          />
-        </Routes>
-      </AnimatePresence>
+            </AnimatePresence>
+          } 
+        />
+      </Routes>
     </div>
   )
 }

@@ -25,7 +25,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      // Input validation
+      if (!email || !password) {
+        return { success: false, message: 'Please provide both email and password' }
+      }
+
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -41,15 +46,24 @@ export const AuthProvider = ({ children }) => {
         return { success: true }
       }
       
-      return { success: false, message: data.message }
+      return { success: false, message: data.message || 'Invalid credentials' }
     } catch (error) {
-      return { success: false, message: 'Network error' }
+      return { success: false, message: 'Network error. Please check your connection and try again.' }
     }
   }
 
   const register = async (name, email, password) => {
     try {
-      const response = await fetch('/api/auth/register', {
+      // Input validation
+      if (!name || !email || !password) {
+        return { success: false, message: 'Please provide all required fields' }
+      }
+
+      if (password.length < 6) {
+        return { success: false, message: 'Password must be at least 6 characters long' }
+      }
+
+      const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
@@ -65,9 +79,9 @@ export const AuthProvider = ({ children }) => {
         return { success: true }
       }
       
-      return { success: false, message: data.message }
+      return { success: false, message: data.message || 'Registration failed' }
     } catch (error) {
-      return { success: false, message: 'Network error' }
+      return { success: false, message: 'Network error. Please check your connection and try again.' }
     }
   }
 

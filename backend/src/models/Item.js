@@ -10,7 +10,7 @@ const itemSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      trim: true, // e.g., "Casio fx-991ES, black color"
+      trim: true, // e.g., "Casio , black color"
     },
     category: {
       type: String,
@@ -24,14 +24,14 @@ const itemSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true, // e.g., "Library", "Cafeteria"
+      required: true, // e.g., "Library", "Cafe"
     },
     dateReported: {
       type: Date,
       default: Date.now,
     },
     imageURL: {
-      type: String, // store Cloudinary/AWS S3 URL or local path
+      type: String, // store or local path
     },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,

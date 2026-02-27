@@ -22,16 +22,20 @@ export const ItemProvider = ({ children }) => {
     setError(null)
     try {
       const params = new URLSearchParams(filters)
-      const response = await fetch(`/api/items?${params}`)
+      const response = await fetch(`http://localhost:5000/api/items?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       const data = await response.json()
       
       if (response.ok) {
         setItems(data)
       } else {
-        setError(data.message)
+        setError(data.message || 'Failed to fetch items')
       }
     } catch (err) {
-      setError('Failed to fetch items')
+      setError('Failed to fetch items. Please check your connection.')
     } finally {
       setLoading(false)
     }
@@ -41,7 +45,7 @@ export const ItemProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/items', {
+      const response = await fetch('http://localhost:5000/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,9 +61,9 @@ export const ItemProvider = ({ children }) => {
         return { success: true, item: data }
       }
       
-      return { success: false, message: data.message }
+      return { success: false, message: data.message || 'Failed to report item' }
     } catch (err) {
-      return { success: false, message: 'Network error' }
+      return { success: false, message: 'Network error. Please check your connection.' }
     } finally {
       setLoading(false)
     }
@@ -69,13 +73,13 @@ export const ItemProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/claims', {
+      const response = await fetch('http://localhost:5000/api/claims', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ item: itemId, proof })
+        body: JSON.stringify({ itemId, proof })
       })
       
       const data = await response.json()
@@ -84,9 +88,9 @@ export const ItemProvider = ({ children }) => {
         return { success: true, claim: data }
       }
       
-      return { success: false, message: data.message }
+      return { success: false, message: data.message || 'Failed to submit claim' }
     } catch (err) {
-      return { success: false, message: 'Network error' }
+      return { success: false, message: 'Network error. Please check your connection.' }
     } finally {
       setLoading(false)
     }
@@ -94,11 +98,29 @@ export const ItemProvider = ({ children }) => {
 
   const getItemById = async (id) => {
     try {
-      const response = await fetch(`/api/items/${id}`)
+      const response = await fetch(`http://localhost:5000/api/items/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       const data = await response.json()
       return response.ok ? data : null
     } catch (err) {
       return null
+    }
+  }
+
+  const getUserClaims = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/claims/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      const data = await response.json()
+      return response.ok ? data : []
+    } catch (err) {
+      return []
     }
   }
 
@@ -110,6 +132,7 @@ export const ItemProvider = ({ children }) => {
     reportItem,
     claimItem,
     getItemById,
+    getUserClaims,
     setItems
   }
 

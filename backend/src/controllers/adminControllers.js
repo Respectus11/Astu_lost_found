@@ -4,7 +4,8 @@ const Item = require("../models/Item");
 // Approve claim (admin only)
 const approveClaim = async (req, res) => {
   const { id } = req.params;
-
+  const { collectionInstructions } = req.body;
+  
   try {
     const claim = await Claim.findById(id).populate("item");
     if (!claim) {
@@ -13,6 +14,12 @@ const approveClaim = async (req, res) => {
 
     claim.status = "approved";
     claim.reviewedBy = req.user._id;
+    
+    // Update collection instructions if provided
+    if (collectionInstructions) {
+      claim.collectionInstructions = collectionInstructions;
+    }
+    
     await claim.save();
 
     // Update item status to claimed

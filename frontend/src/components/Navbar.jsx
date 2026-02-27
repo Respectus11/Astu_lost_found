@@ -21,6 +21,11 @@ const Navbar = () => {
   }, [])
 
   const navLinks = [
+    { path: '/report-lost', label: 'Report Lost', icon: Plus },
+    { path: '/report-found', label: 'Report Found', icon: Plus },
+  ]
+
+  const userNavLinks = [
     { path: '/search', label: 'Browse', icon: Search },
     { path: '/report-lost', label: 'Report Lost', icon: Plus },
     { path: '/report-found', label: 'Report Found', icon: Plus },
@@ -111,39 +116,66 @@ const Navbar = () => {
         alignItems: 'center',
         gap: '0.5rem',
       }}>
-        {navLinks.map((link) => (
-          <Link key={link.path} to={link.path} style={{ textDecoration: 'none' }}>
+        {isAuthenticated && isAdmin() ? (
+          // Admin navigation - only show Admin Dashboard
+          <Link to="/admin" style={{ textDecoration: 'none' }}>
             <motion.span
               whileHover={{ y: -2 }}
               style={{
-                padding: '0.6rem 1.2rem',
+                padding: '0.6rem 1rem',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: 500,
-                color: location.pathname === link.path 
-                  ? 'var(--accent-gold)' 
-                  : 'var(--text-secondary)',
-                background: location.pathname === link.path 
-                  ? 'rgba(245, 166, 35, 0.1)' 
-                  : 'transparent',
-                transition: 'all 0.2s ease',
+                color: location.pathname === '/admin' ? 'var(--accent-gold)' : 'var(--accent-teal)',
+                background: location.pathname === '/admin' ? 'rgba(245, 166, 35, 0.1)' : 'rgba(0, 212, 170, 0.1)',
+                border: location.pathname === '/admin' ? '1px solid rgba(245, 166, 35, 0.2)' : '1px solid rgba(0, 212, 170, 0.2)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
+                transition: 'all 0.2s ease',
               }}
             >
-              <link.icon size={16} />
-              {link.label}
+              <Shield size={16} />
+              Admin Dashboard
             </motion.span>
           </Link>
-        ))}
+        ) : (
+          // Regular user navigation - show Report Lost and Report Found
+          navLinks.map((link) => (
+            <Link key={link.path} to={link.path} style={{ textDecoration: 'none' }}>
+              <motion.span
+                whileHover={{ y: -2 }}
+                style={{
+                  padding: '0.6rem 1.2rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  color: location.pathname === link.path 
+                    ? 'var(--accent-gold)' 
+                    : 'var(--text-secondary)',
+                  background: location.pathname === link.path 
+                    ? 'rgba(245, 166, 35, 0.1)' 
+                    : 'transparent',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <link.icon size={16} />
+                {link.label}
+              </motion.span>
+            </Link>
+          ))
+        )}
 
         {/* Auth Section */}
         {isAuthenticated ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: '1rem' }}>
-            {isAdmin() && (
-              <Link to="/admin" style={{ textDecoration: 'none' }}>
+            {!isAdmin() && (
+              <Link to="/my-claims" style={{ textDecoration: 'none' }}>
                 <motion.span
                   whileHover={{ y: -2 }}
                   style={{
@@ -151,17 +183,18 @@ const Navbar = () => {
                     borderRadius: 'var(--radius-md)',
                     fontSize: '0.85rem',
                     fontWeight: 500,
-                    color: 'var(--accent-teal)',
-                    background: 'rgba(0, 212, 170, 0.1)',
-                    border: '1px solid rgba(0, 212, 170, 0.2)',
+                    color: location.pathname === '/my-claims' ? 'var(--accent-teal)' : 'var(--text-secondary)',
+                    background: location.pathname === '/my-claims' ? 'rgba(0, 212, 170, 0.1)' : 'transparent',
+                    border: location.pathname === '/my-claims' ? '1px solid rgba(0, 212, 170, 0.2)' : '1px solid transparent',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <Shield size={16} />
-                  Admin
+                  <LayoutGrid size={16} />
+                  My Claims
                 </motion.span>
               </Link>
             )}

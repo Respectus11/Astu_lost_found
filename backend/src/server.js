@@ -9,6 +9,7 @@ const claimRoutes = require("./routes/claimRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const itemRoutes = require("./routes/itemRoutes");
+const seedInitialAdmin = require("./utils/seedAdmin");
 
 dotenv.config();
 
@@ -43,34 +44,58 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS configuration
+// CORS configuration - Allow all origins for faster local development
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost from any port for development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow the configured frontend URL
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174'
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  exposedHeaders: ['Content-Length', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours cache for preflight requests
 }));
 
-app.use("/auth", authRoutes);
-app.use("/items", itemRoutes);
-app.use("/claims", claimRoutes);
-app.use("/admin", adminRoutes);
-app.use("/dashboard", dashboardRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/claims", claimRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/ping", (req, res) => {
-  res.json({ message: "Server is running 🚀" });
+  res.json({ message: "Server is running" });
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
   res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'production' ? {} : err.message
   });
 });
 
-// 404 handler
+// 404 error message handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
@@ -79,8 +104,13 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  .then(async () => {
+    // Seed initial admin user after successful database connection
+    await seedInitialAdmin();
+    
+    app.listen(PORT, () => {
+    });
   })
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+  .catch(err => {
+    process.exit(1);
+  });

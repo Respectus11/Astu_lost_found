@@ -42,14 +42,23 @@ const reportFoundItem = async (req, res) => {
   }
 };
 
-// Search items (by category, status, location, etc.)
+// Search items (by category, status, location, and text search)
 const searchItems = async (req, res) => {
-  const { category, status, location } = req.query;
+  const { category, status, location, search } = req.query;
 
   let filter = {};
   if (category) filter.category = category;
   if (status) filter.status = status;
   if (location) filter.location = location;
+  
+  // Add text search functionality
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+      { category: { $regex: search, $options: 'i' } }
+    ];
+  }
 
   try {
     const items = await Item.find(filter).populate("reportedBy", "name email");

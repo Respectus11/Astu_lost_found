@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle, Upload, Image as ImageIcon, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useItems } from '../context/ItemContext.jsx'
 
@@ -22,6 +22,9 @@ const ReportLost = () => {
     title: '', description: '', category: '', location: '',
     dateReported: new Date().toISOString().split('T')[0],
   })
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState('')
+  const [imageError, setImageError] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -33,15 +36,96 @@ const ReportLost = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setImageError('Please upload an image file (JPEG, PNG, GIF, etc.)')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setImageError('Image size must be less than 5MB')
+        return
+      }
+
+      setImageError('')
+      setImageFile(file)
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleImageDrop = (e) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    if (file) {
+      handleImageChange({ target: { files: [file] } })
+    }
+  }
+
+  const handleImageDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    setImagePreview('')
+    setImageError('')
+    // Reset file input
+    const fileInput = document.getElementById('image-upload')
+    if (fileInput) {
+      fileInput.value = ''
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!isAuthenticated) { navigate('/login'); return }
+    
     setError('')
-    setLoading(true)
-    const result = await reportItem({ ...formData, status: 'lost' })
-    if (result.success) { setSuccess(true); setTimeout(() => navigate('/'), 2000) }
-    else { setError(result.message || 'Failed to report item') }
-    setLoading(false)
+    
+    // Handle image upload
+    let imageURL = ''
+    if (imageFile) {
+      try {
+        // For now, we'll use a simple approach - in production, you'd want to upload to cloud storage
+        const reader = new FileReader()
+        reader.onload = async (e) => {
+          imageURL = e.target.result
+          const result = await reportItem({ 
+            ...formData, 
+            status: 'lost',
+            imageURL 
+          })
+          if (result.success) { 
+            setSuccess(true); 
+            setTimeout(() => navigate('/'), 2000) 
+          }
+          else { 
+            setError(result.message || 'Failed to report item') 
+          }
+          setLoading(false)
+        }
+        reader.readAsDataURL(imageFile)
+      } catch (err) {
+        setError('Failed to process image')
+        setLoading(false)
+      }
+    } else {
+      setLoading(true)
+      const result = await reportItem({ ...formData, status: 'lost' })
+      if (result.success) { setSuccess(true); setTimeout(() => navigate('/'), 2000) }
+      else { setError(result.message || 'Failed to report item') }
+      setLoading(false)
+    }
   }
 
   if (success) {
@@ -96,6 +180,101 @@ const ReportLost = () => {
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Detailed Description *</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Describe your item in detail..." required rows={5} style={{ width: '100%', padding: '0.875rem 1rem', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', fontSize: '0.95rem', color: 'var(--text-primary)', resize: 'vertical', minHeight: '120px' }} />
               </div>
+              
+              {/* Image Upload Section */}
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>Item Photo (Optional)</label>
+                <div
+                  onDrop={handleImageDrop}
+                  onDragOver={handleImageDragOver}
+                  style={{
+                    border: imageError ? '2px dashed var(--status-lost)' : '2px dashed var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '2rem',
+                    textAlign: 'center',
+                    background: 'var(--bg-surface)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    position: 'relative',
+                    minHeight: '150px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {imagePreview ? (
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        style={{ 
+                          width: '100%', 
+                          maxHeight: '200px', 
+                          objectFit: 'cover', 
+                          borderRadius: 'var(--radius-md)',
+                          border: '1px solid var(--border-subtle)'
+                        }} 
+                      />
+                      <button
+                        onClick={removeImage}
+                        style={{
+                          position: 'absolute',
+                          top: '-10px',
+                          right: '-10px',
+                          background: 'var(--status-lost)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '24px',
+                          height: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload size={40} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+                      <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                        Drag and drop your item photo here, or click to browse
+                      </p>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', opacity: 0.8 }}>
+                        Supports JPEG, PNG, GIF • Max 5MB
+                      </p>
+                    </>
+                  )}
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer'
+                    }}
+                  />
+                </div>
+                {imageError && (
+                  <p style={{ color: 'var(--status-lost)', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                    {imageError}
+                  </p>
+                )}
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                  Tip: For ID cards, ensure the photo is clear and all details are visible
+                </p>
+              </div>
+
               <motion.button type="submit" disabled={loading} whileHover={{ scale: loading ? 1 : 1.02 }} whileTap={{ scale: loading ? 1 : 0.98 }}
                 style={{ width: '100%', padding: '1rem', background: loading ? 'var(--bg-surface)' : 'linear-gradient(135deg, var(--status-lost) 0%, #cc3a47 100%)', border: 'none', borderRadius: 'var(--radius-md)', fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 0 25px rgba(255, 71, 87, 0.3)' }}>
                 {loading ? 'Submitting...' : 'Report Lost Item'}

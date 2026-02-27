@@ -17,7 +17,7 @@ const SearchItems = () => {
 
   useEffect(() => {
     fetchItems(filters)
-  }, [])
+  }, [filters])
 
   const handleSearch = (newFilters) => {
     setFilters(newFilters)
