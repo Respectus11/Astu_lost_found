@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import api from '../services/api'
 
 const AuthContext = createContext(null)
 
@@ -30,25 +31,19 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Please provide both email and password' }
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
+      const response = await api.post('/auth/login', { email, password })
       
-      const data = await response.json()
-      
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        setToken(data.token)
-        setUser(data.user)
+      if (response.data) {
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+        setToken(response.data.token)
+        setUser(response.data.user)
         return { success: true }
       }
       
-      return { success: false, message: data.message || 'Invalid credentials' }
+      return { success: false, message: response.data.message || 'Invalid credentials' }
     } catch (error) {
-      return { success: false, message: 'Network error. Please check your connection and try again.' }
+      return { success: false, message: error.response?.data?.message || 'Network error. Please check your connection and try again.' }
     }
   }
 
@@ -63,25 +58,19 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Password must be at least 6 characters long' }
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      })
+      const response = await api.post('/auth/register', { name, email, password })
       
-      const data = await response.json()
-      
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        setToken(data.token)
-        setUser(data.user)
+      if (response.data) {
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+        setToken(response.data.token)
+        setUser(response.data.user)
         return { success: true }
       }
       
-      return { success: false, message: data.message || 'Registration failed' }
+      return { success: false, message: response.data.message || 'Registration failed' }
     } catch (error) {
-      return { success: false, message: 'Network error. Please check your connection and try again.' }
+      return { success: false, message: error.response?.data?.message || 'Network error. Please check your connection and try again.' }
     }
   }
 

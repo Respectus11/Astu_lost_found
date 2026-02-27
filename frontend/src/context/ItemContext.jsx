@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import { useAuth } from './AuthContext'
+import api from '../services/api'
 
 const ItemContext = createContext(null)
 
@@ -21,21 +22,10 @@ export const ItemProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const params = new URLSearchParams(filters)
-      const response = await fetch(`http://localhost:5000/api/items?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      const data = await response.json()
-      
-      if (response.ok) {
-        setItems(data)
-      } else {
-        setError(data.message || 'Failed to fetch items')
-      }
+      const response = await api.get('/items', { params: filters })
+      setItems(response.data)
     } catch (err) {
-      setError('Failed to fetch items. Please check your connection.')
+      setError(err.response?.data?.message || 'Failed to fetch items')
     } finally {
       setLoading(false)
     }
@@ -45,25 +35,14 @@ export const ItemProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:5000/api/items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(itemData)
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        setItems(prev => [data, ...prev])
-        return { success: true, item: data }
+      const response = await api.post('/items', itemData)
+      if (response.data) {
+        setItems(prev => [response.data, ...prev])
+        return { success: true, item: response.data }
       }
-      
-      return { success: false, message: data.message || 'Failed to report item' }
+      return { success: false, message: response.data?.message || 'Failed to report item' }
     } catch (err) {
-      return { success: false, message: 'Network error. Please check your connection.' }
+      return { success: false, message: err.response?.data?.message || 'Network error. Please check your connection.' }
     } finally {
       setLoading(false)
     }
@@ -73,24 +52,13 @@ export const ItemProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:5000/api/claims', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ itemId, proof })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        return { success: true, claim: data }
+      const response = await api.post('/claims', { itemId, proof })
+      if (response.data) {
+        return { success: true, claim: response.data }
       }
-      
-      return { success: false, message: data.message || 'Failed to submit claim' }
+      return { success: false, message: response.data?.message || 'Failed to submit claim' }
     } catch (err) {
-      return { success: false, message: 'Network error. Please check your connection.' }
+      return { success: false, message: err.response?.data?.message || 'Network error. Please check your connection.' }
     } finally {
       setLoading(false)
     }
@@ -98,13 +66,8 @@ export const ItemProvider = ({ children }) => {
 
   const getItemById = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/items/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      const data = await response.json()
-      return response.ok ? data : null
+      const response = await api.get(`/items/${id}`)
+      return response.data
     } catch (err) {
       return null
     }
@@ -112,13 +75,8 @@ export const ItemProvider = ({ children }) => {
 
   const getUserClaims = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/claims/user', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      const data = await response.json()
-      return response.ok ? data : []
+      const response = await api.get('/claims')
+      return response.data
     } catch (err) {
       return []
     }
