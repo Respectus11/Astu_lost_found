@@ -128,6 +128,72 @@ Astu_lost_found/
 └── .gitignore                 # Git ignore file
 ```
 
+## Demo Screenshots
+
+Experience the ASTU Lost and Found System through these screenshots showcasing the application's key features and beautiful design:
+
+### User Interface Showcase
+
+<div align="center">
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px;">
+    <div>
+      <img src="./frontend/public/screenshots/landingpage.png" alt="Landing Page Hero Section" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Landing Page - Hero Section</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/how it works(landingpage).png" alt="How It Works Section" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">How It Works - Process Overview</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/Get started.png" alt="Get Started CTA Section" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Get Started - Call to Action</p>
+    </div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin-top: 20px;">
+    <div>
+      <img src="./frontend/public/screenshots/items to claim.png" alt="Items to Claim Grid" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Items to Claim - Recently Found</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/reportFoundItem.png" alt="Report Found Item Form" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Report Found Item - Submission Form</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/Myclaims.png" alt="My Claims Dashboard" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">My Claims - User Dashboard</p>
+    </div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin-top: 20px;">
+    <div>
+      <img src="./frontend/public/screenshots/admindashboard.png" alt="Admin Dashboard Overview" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Admin Dashboard - Overview</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/adminsummary.png" alt="Admin Summary Section" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Admin Summary - Statistics</p>
+    </div>
+    <div>
+      <img src="./frontend/public/screenshots/mobile responsive.png" alt="Mobile Responsive Design" width="100%" style="border-radius: 12px; border: 1px solid #2a2a35;">
+      <p align="center" style="font-size: 0.9rem; color: #8888a0; margin-top: 8px;">Mobile Responsive - Cross-Device</p>
+    </div>
+  </div>
+</div>
+
+### Design Features Highlighted
+
+- **Modern Dark Theme**: Elegant dark color scheme with gold and teal accents
+- **Responsive Design**: Fully responsive layout that works on desktop, tablet, and mobile devices
+- **Interactive Elements**: Smooth animations and hover effects using Framer Motion
+- **User-Friendly Interface**: Intuitive navigation and clear visual hierarchy
+- **Professional Typography**: Carefully selected fonts for optimal readability
+- **Status Indicators**: Clear visual feedback for item status and claim progress
+
+### Technical Implementation
+
+The application features a sophisticated frontend built with React, utilizing modern CSS-in-JS styling with CSS variables for consistent theming. The design incorporates subtle animations, gradient effects, and a carefully crafted color palette that enhances user experience while maintaining accessibility standards.
+
 ## Installation
 
 ### Prerequisites
