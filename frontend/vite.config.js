@@ -15,7 +15,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'terser',
+    minify: false, // Disable minification to avoid terser dependency
     rollupOptions: {
       output: {
         manualChunks: {
