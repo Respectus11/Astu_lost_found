@@ -14,10 +14,5 @@
       "src": "/(.*)",
       "dest": "/frontend/index.html"
     }
-  ],
-  "functions": {
-    "src/**/*.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
